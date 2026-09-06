@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BusinessTwin.Server.Tests/BusinessTwin.Server.Tests.csproj" />
+  <Project Path="BusinessTwin.Server/BusinessTwin.Server.csproj" />
+</Solution>

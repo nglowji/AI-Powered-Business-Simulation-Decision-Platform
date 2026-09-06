@@ -1,0 +1,22 @@
+# Markdown documentation stays local, except the public README.
+*.md
+!README.md
+
+# Build output and local dependencies.
+**/bin/
+**/obj/
+client/node_modules/
+client/dist/
+
+# Local environment files.
+*.user
+*.suo
+*.env
+*.env.*
+!.env.example
+
+# IDE and OS files.
+.vs/
+.vscode/
+.DS_Store
+Thumbs.db
