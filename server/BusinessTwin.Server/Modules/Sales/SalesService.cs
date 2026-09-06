@@ -1,5 +1,7 @@
 namespace BusinessTwin.Server.Modules.Sales;
 
+using BusinessTwin.Server.Modules.Inventory;
+
 public sealed class SalesService
 {
     private readonly Dictionary<Guid, SalesOrder> orders = new();
@@ -29,5 +31,40 @@ public sealed class SalesService
         var order = GetOrder(orderId);
         order.ChangeStatus(status);
         return order;
+    }
+
+    public IReadOnlyList<InventoryTransaction> CompleteDelivery(
+        Guid orderId,
+        CompleteDeliveryRequest request,
+        InventoryService inventoryService,
+        DateTimeOffset deliveredAt,
+        string actor)
+    {
+        var order = GetOrder(orderId);
+        if (order.Status != SalesOrderStatus.Processing)
+        {
+            throw new InvalidOperationException("Only a processing order can be delivered.");
+        }
+
+        foreach (var line in order.Lines)
+        {
+            var balance = inventoryService.GetBalance(line.ProductId, request.WarehouseId);
+            if (balance.AvailableQuantity < line.Quantity)
+            {
+                throw new InvalidOperationException("The order exceeds available inventory.");
+            }
+        }
+
+        var transactions = order.Lines.Select(line => inventoryService.ApplyTransaction(
+            new InventoryTransactionRequest(
+                line.ProductId,
+                request.WarehouseId,
+                InventoryTransactionType.Out,
+                line.Quantity,
+                $"SO-{orderId}"),
+            deliveredAt,
+            actor)).ToArray();
+        order.ChangeStatus(SalesOrderStatus.Completed);
+        return transactions;
     }
 }

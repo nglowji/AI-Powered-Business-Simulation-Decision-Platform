@@ -24,6 +24,8 @@ public sealed record CreateSalesOrderRequest(
     Guid CustomerId,
     IReadOnlyList<SalesOrderLineRequest> Lines);
 
+public sealed record CompleteDeliveryRequest(Guid WarehouseId);
+
 public sealed record SalesOrderLine(
     Guid ProductId,
     int Quantity,

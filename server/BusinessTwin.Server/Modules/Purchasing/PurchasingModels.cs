@@ -38,6 +38,16 @@ public sealed record PurchaseLine(Guid ProductId, int Quantity, decimal UnitCost
     public decimal Total => Quantity * UnitCost;
 }
 
+public sealed record ReceivePurchaseRequest(Guid ProductId, Guid WarehouseId, int Quantity);
+
+public sealed record PurchaseReceipt(
+    Guid PurchaseOrderId,
+    Guid ProductId,
+    Guid WarehouseId,
+    int Quantity,
+    DateTimeOffset ReceivedAt,
+    string Actor);
+
 public sealed class PurchaseRequest : EntityAudit
 {
     public PurchaseRequest(
@@ -112,6 +122,11 @@ public sealed class PurchaseOrder : EntityAudit
     public PaymentStatus PaymentStatus { get; private set; }
 
     public decimal Total => Lines.Sum(line => line.Total);
+
+    public int OrderedQuantity(Guid productId)
+    {
+        return Lines.Where(line => line.ProductId == productId).Sum(line => line.Quantity);
+    }
 
     public void ChangeStatus(PurchaseOrderStatus nextStatus)
     {

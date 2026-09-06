@@ -8,7 +8,7 @@ public sealed class AiAssistantService
         {
             return new AiAssistantResponse(
                 "unknown",
-                "Question is required.",
+                "Vui lòng nhập câu hỏi.",
                 [],
                 false);
         }
@@ -21,9 +21,9 @@ public sealed class AiAssistantService
             return CreateMetricResponse(
                 "revenue_analysis",
                 facts?.Revenue,
-                "Revenue",
+                "Doanh thu",
                 facts?.AsOfDate,
-                "No realtime revenue data was provided. The assistant will not guess.");
+                "Chưa có dữ liệu doanh thu realtime. Trợ lý sẽ không tự suy đoán.");
         }
 
         if (ContainsAny(question, "lợi nhuận", "loi nhuan", "profit"))
@@ -31,9 +31,9 @@ public sealed class AiAssistantService
             return CreateMetricResponse(
                 "profit_analysis",
                 facts?.Profit,
-                "Profit",
+                "Lợi nhuận",
                 facts?.AsOfDate,
-                "No realtime profit data was provided. The assistant will not guess.");
+                "Chưa có dữ liệu lợi nhuận realtime. Trợ lý sẽ không tự suy đoán.");
         }
 
         if (ContainsAny(question, "tồn kho", "ton kho", "inventory", "kho"))
@@ -41,14 +41,14 @@ public sealed class AiAssistantService
             return CreateMetricResponse(
                 "inventory_analysis",
                 facts?.InventoryValue,
-                "Inventory value",
+                "Giá trị tồn kho",
                 facts?.AsOfDate,
-                "No realtime inventory data was provided. The assistant will not guess.");
+                "Chưa có dữ liệu tồn kho realtime. Trợ lý sẽ không tự suy đoán.");
         }
 
         return new AiAssistantResponse(
             "unknown",
-            "The question is not mapped to a business tool yet.",
+            "Câu hỏi này chưa được kết nối với business tool phù hợp.",
             [],
             true);
     }
@@ -65,10 +65,10 @@ public sealed class AiAssistantService
             return new AiAssistantResponse(intent, missingDataMessage, [], true);
         }
 
-        var dateText = asOfDate?.ToString("yyyy-MM-dd") ?? "the supplied date";
+        var dateText = asOfDate?.ToString("dd/MM/yyyy") ?? "ngày được cung cấp";
         return new AiAssistantResponse(
             intent,
-            $"{metricName} is {value.Value:N2} as of {dateText}.",
+            $"{metricName} hiện là {value.Value:N2} tại ngày {dateText}.",
             ["business-facts-tool"],
             false);
     }

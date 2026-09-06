@@ -1,5 +1,7 @@
 namespace BusinessTwin.Server.Modules.Sales;
 
+using BusinessTwin.Server.Modules.Inventory;
+
 public static class SalesEndpoints
 {
     public static IEndpointRouteBuilder MapSalesEndpoints(this IEndpointRouteBuilder endpoints)
@@ -36,6 +38,32 @@ public static class SalesEndpoints
             try
             {
                 return Results.Ok(service.ChangeStatus(orderId, status));
+            }
+            catch (KeyNotFoundException exception)
+            {
+                return Results.NotFound(new { error = exception.Message });
+            }
+            catch (InvalidOperationException exception)
+            {
+                return Results.Conflict(new { error = exception.Message });
+            }
+        });
+
+        group.MapPost("/{orderId:guid}/delivery", (
+            Guid orderId,
+            CompleteDeliveryRequest request,
+            SalesService salesService,
+            InventoryService inventoryService) =>
+        {
+            try
+            {
+                var transactions = salesService.CompleteDelivery(
+                    orderId,
+                    request,
+                    inventoryService,
+                    DateTimeOffset.UtcNow,
+                    "system");
+                return Results.Ok(transactions);
             }
             catch (KeyNotFoundException exception)
             {

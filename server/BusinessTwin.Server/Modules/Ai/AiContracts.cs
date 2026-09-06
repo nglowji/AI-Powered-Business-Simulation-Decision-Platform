@@ -16,3 +16,21 @@ public sealed record AiAssistantResponse(
     string Answer,
     IReadOnlyList<string> Sources,
     bool RequiresRealtimeData);
+
+public sealed record AiAnalyticsRequest(
+    BusinessFacts Current,
+    BusinessFacts? Previous,
+    decimal? ExpectedDemandPerDay,
+    int ForecastDays);
+
+public sealed record AiForecastResponse(
+    decimal? ForecastRevenue,
+    decimal? ForecastInventoryValue,
+    decimal? RevenueGrowthPercent,
+    bool RequiresRealtimeData,
+    IReadOnlyList<string> Sources);
+
+public sealed record AiRecommendation(
+    string Action,
+    string Reason,
+    string Priority);

@@ -27,7 +27,7 @@ public sealed class AiAssistantServiceTests
         var response = service.Answer(new AiAssistantRequest("Revenue this month?", null));
 
         Assert.True(response.RequiresRealtimeData);
-        Assert.Contains("will not guess", response.Answer);
+        Assert.Contains("không tự suy đoán", response.Answer);
         Assert.Empty(response.Sources);
     }
 }

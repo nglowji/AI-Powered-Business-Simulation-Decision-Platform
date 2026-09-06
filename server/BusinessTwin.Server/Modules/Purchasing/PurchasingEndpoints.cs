@@ -1,5 +1,7 @@
 namespace BusinessTwin.Server.Modules.Purchasing;
 
+using BusinessTwin.Server.Modules.Inventory;
+
 public static class PurchasingEndpoints
 {
     public static IEndpointRouteBuilder MapPurchasingEndpoints(this IEndpointRouteBuilder endpoints)
@@ -41,6 +43,32 @@ public static class PurchasingEndpoints
             {
                 var order = service.CreateOrderFromApprovedRequest(requestId, DateTimeOffset.UtcNow, "system");
                 return Results.Created($"/api/v1/purchasing/orders/{order.Id}", order);
+            }
+            catch (KeyNotFoundException exception)
+            {
+                return Results.NotFound(new { error = exception.Message });
+            }
+            catch (InvalidOperationException exception)
+            {
+                return Results.Conflict(new { error = exception.Message });
+            }
+        });
+
+        group.MapPost("/orders/{orderId:guid}/receive", (
+            Guid orderId,
+            ReceivePurchaseRequest request,
+            PurchasingService purchasingService,
+            InventoryService inventoryService) =>
+        {
+            try
+            {
+                var receipt = purchasingService.Receive(
+                    orderId,
+                    request,
+                    inventoryService,
+                    DateTimeOffset.UtcNow,
+                    "system");
+                return Results.Created($"/api/v1/purchasing/orders/{orderId}/receipts", receipt);
             }
             catch (KeyNotFoundException exception)
             {
